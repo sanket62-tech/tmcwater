@@ -1,0 +1,17 @@
+{
+  "settings": "सेटिंग्स",
+  "profileSettings": "प्रोफाइल सेटिंग",
+  "notifications": "सूचना",
+  "privacySecurity": "गोपनीयता आणि सुरक्षा",
+  "language": "भाषा",
+  "helpSupport": "मदत आणि समर्थन",
+  "aboutApp": "अॅपबद्दल",
+  "logout": "लॉगआउट",
+  "waterCollector": "पाणी संकलक",
+  "profileDetails": "प्रोफाइल तपशील",
+  "fullName": "पूर्ण नाव",
+  "email": "ईमेल",
+  "username": "वापरकर्तानाव",
+  "role": "भूमिका",
+  "close": "बंद करा"
+}

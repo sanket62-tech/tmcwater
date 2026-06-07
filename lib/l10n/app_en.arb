@@ -1,0 +1,17 @@
+{
+  "settings": "Settings",
+  "profileSettings": "Profile Settings",
+  "notifications": "Notifications",
+  "privacySecurity": "Privacy & Security",
+  "language": "Language",
+  "helpSupport": "Help & Support",
+  "aboutApp": "About App",
+  "logout": "Logout",
+  "waterCollector": "Water Collector",
+  "profileDetails": "Profile Details",
+  "fullName": "Full Name",
+  "email": "Email",
+  "username": "Username",
+  "role": "Role",
+  "close": "Close"
+}

@@ -1,0 +1,44 @@
+name: water_collector
+description: "An enterprise-grade field utility application designed for municipal site inspectors to streamline the water sample collection process. The app enables seamless on-site data logging, sample tracking, and digital laboratory dispatch to ensure efficient and transparent water quality monitoring."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl:
+  cupertino_icons: ^1.0.8
+  geolocator: ^13.0.1
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  dio: ^5.7.0
+  basic_utils: ^5.7.0
+  pointycastle: ^3.9.1
+  flutter_secure_storage: ^9.2.2
+  url_launcher: ^6.3.1
+  provider: ^6.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/tmc logo.jpg"
+  min_sdk_android: 21
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/Gemini_Generated_Image_jqdwz0jqdwz0jqdw.png
+    - assets/logo_V1 (1).png
+    - assets/tmc logo.jpg
