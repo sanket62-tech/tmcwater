@@ -13,5 +13,161 @@
   "email": "Email",
   "username": "Username",
   "role": "Role",
-  "close": "Close"
+  "close": "Close",
+
+  "sampleFormAppBarTitle": "Water Testing",
+  "sampleFormAppBarSubtitle": "Sample Collection Form",
+  "help": "Help",
+
+  "collectorInformation": "Collector Information",
+  "locationDetails": "Location Details",
+  "sampleSourceClassification": "Sample Source & Classification",
+  "additionalDetails": "Additional Details",
+
+  "stepInfo": "Info",
+  "stepLocation": "Location",
+  "stepSource": "Source",
+  "stepDetails": "Details",
+
+  "collectedDateLabel": "Collected Date *",
+  "collectedDateHint": "DD / MM / YYYY",
+  "collectedTimeLabel": "Collected Time *",
+  "collectedTimeHint": "HH : MM",
+  "collectorNameLabel": "Collector Name *",
+  "collectorNameHint": "Enter full name",
+  "mobileNumberLabel": "Mobile Number *",
+  "mobileNumberHint": "10-digit mobile number",
+  "emailAddressLabel": "Email Address",
+  "emailAddressHint": "collector@tmc.gov.in (optional)",
+
+  "weatherConditionsLabel": "Weather Conditions *",
+  "selectWeatherHint": "Select weather",
+  "geoTaggingLabel": "Geo-tagging *",
+  "tapToCaptureLocation": "Tap to capture location",
+  "recapture": "Re-capture",
+  "capture": "Capture",
+  "capturePhotosLabel": "Capture Photos",
+  "addPhoto": "Add Photo",
+
+  "waterSourceTypeLabel": "Water / Source Type",
+  "agencyLabel": "Agency",
+  "wardLabel": "Ward",
+  "typeLabel": "Type",
+  "areaLabel": "Area",
+  "codeNameLabel": "Code / Name",
+  "codeNameHelperText": "Code / Name options depend on the selected ward.",
+  "selectPrefix": "Select",
+
+  "chlorineMeterTestLabel": "Chlorino Meter Test *",
+  "chlorineHint": "0.00",
+  "ppmUnit": "ppm",
+  "specialRequestLabel": "Special Request with Reason",
+  "specialRequestHint": "Describe any special testing requests and reason…",
+  "additionalInfoLabel": "Any Additional Relevant Information",
+  "additionalInfoHint": "e.g. recent complaints, visible contamination…",
+  "specificParamsLabel": "Specific Parameters to be Tested",
+  "specificParamsHint": "e.g. pH, Turbidity, E.coli, TDS, Hardness…",
+
+  "requiredField": "Required",
+  "enterValidMobileNumber": "Enter valid 10-digit number",
+  "invalidEmail": "Invalid email",
+  "pleaseCaptureLocation": "Please capture location",
+
+  "errorLoadingFormData": "Error loading form data: {error}",
+  "@errorLoadingFormData": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "failedToLoadSourceCodes": "Failed to load source codes: {error}",
+  "@failedToLoadSourceCodes": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "locationServicesDisabled": "Location services are disabled.",
+  "locationPermissionDenied": "Location permissions are denied",
+  "locationPermissionPermanentlyDenied": "Location permissions are permanently denied, we cannot request permissions.",
+  "errorFetchingLocation": "Error fetching location: {error}",
+  "@errorFetchingLocation": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "captureFromCamera": "Capture from Camera",
+  "chooseFromGalleryMultiple": "Choose from Gallery (Multiple)",
+  "formSavedSomeImagesFailed": "Form saved, but some images failed to upload.",
+  "errorWithMessage": "Error: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "pleaseFillAllRequiredFields": "Please fill all required fields.",
+  "success": "Success",
+  "originalNoLabel": "Original No: ",
+  "notAvailable": "N/A",
+  "ok": "OK",
+  "submitSampleForm": "Submit Sample Form",
+  "submitting": "Submitting…",
+
+  "historyAppBarSubtitle": "Sample History",
+  "refresh": "Refresh",
+  "retry": "Retry",
+  "searchHistoryHint": "Search by Original No, Ward...",
+  "recentSubmissions": "Recent Submissions",
+  "recordsCount": "{count} Records",
+  "@recordsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "columnOriginalNo": "Original No.",
+  "columnWard": "Ward",
+  "columnType": "Type",
+  "columnDate": "Date",
+  "columnDetails": "Details",
+  "sampleDetails": "Sample Details",
+  "generalInfo": "General Info",
+  "collectorInfo": "Collector Info",
+  "locationSource": "Location & Source",
+  "testingInfo": "Testing Info",
+  "uploadedDocuments": "Uploaded Documents",
+  "noDocumentsFound": "No documents found.",
+  "couldNotOpenDocument": "Could not open the document link.",
+  "detailOriginalNo": "Original No",
+  "detailStatus": "Status",
+  "detailDate": "Date",
+  "detailTime": "Time",
+  "detailName": "Name",
+  "detailMobile": "Mobile",
+  "detailEmail": "Email",
+  "detailWard": "Ward",
+  "detailArea": "Area",
+  "detailSourceType": "Source Type",
+  "detailAgency": "Agency",
+  "detailCodeId": "Code ID",
+  "detailCodeName": "Code Name",
+  "detailWeather": "Weather",
+  "detailLatLong": "Lat/Long",
+  "detailResidualChlorine": "Residual Chlorine",
+  "detailEnquiryType": "Enquiry Type",
+  "detailSpecialRequest": "Special Request",
+  "detailAdditionalInfo": "Additional Info",
+  "detailSpecificParams": "Specific Params",
+  "pageOfLabel": "Page {current} of {total}",
+  "@pageOfLabel": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "noRecordsFound": "No records found",
+  "noResultsFor": "No results for \"{query}\"",
+  "@noResultsFor": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "clearSearch": "Clear Search"
 }

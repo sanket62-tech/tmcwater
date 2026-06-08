@@ -11,6 +11,7 @@ import 'package:water_collector/src/features/sample_form/data/models/water_sampl
 import 'package:water_collector/src/core/services/storage_service.dart';
 import 'package:intl/intl.dart';
 import 'package:water_collector/src/features/home/presentation/screens/main_screen.dart';
+import 'package:water_collector/l10n/app_localizations.dart';
 
 
 
@@ -94,6 +95,11 @@ class SampleCollectionFormPage extends StatefulWidget {
 class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _scroll = ScrollController();
+
+  /// Shorthand accessor for the localized strings — safe to use both inside
+  /// `build()` and in async callbacks (the State's `context` stays valid for
+  /// as long as the widget is mounted).
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   // ── Section 1 ──
@@ -161,7 +167,22 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
     super.initState();
     _collectedDate = DateTime.now();
     _collectedTime = TimeOfDay.now();
+    _loadUserData();
     _fetchAllDropdownData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await StorageService().getUserData();
+    if (userData != null) {
+      setState(() {
+        if (userData.fullName != null) {
+          _nameCtrl.text = userData.fullName!;
+        }
+        if (userData.email != null) {
+          _emailCtrl.text = userData.email!;
+        }
+      });
+    }
   }
 
   Future<void> _fetchAllDropdownData() async {
@@ -210,7 +231,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       if (mounted) {
         setState(() => _isLoadingDropdowns = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading form data: $e')),
+          SnackBar(content: Text(_l10n.errorLoadingFormData(e.toString()))),
         );
       }
     }
@@ -235,7 +256,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       if (mounted) {
         setState(() => _isLoadingSourceCodes = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load source codes: $e')),
+          SnackBar(content: Text(_l10n.failedToLoadSourceCodes(e.toString()))),
         );
       }
     }
@@ -300,7 +321,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         setState(() => _geoLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location services are disabled.')),
+            SnackBar(content: Text(_l10n.locationServicesDisabled)),
           );
         }
         return;
@@ -313,7 +334,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           setState(() => _geoLoading = false);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Location permissions are denied')),
+              SnackBar(content: Text(_l10n.locationPermissionDenied)),
             );
           }
           return;
@@ -324,7 +345,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         setState(() => _geoLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are permanently denied, we cannot request permissions.')),
+            SnackBar(content: Text(_l10n.locationPermissionPermanentlyDenied)),
           );
         }
         return;
@@ -346,7 +367,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       setState(() => _geoLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching location: $e')),
+          SnackBar(content: Text(_l10n.errorFetchingLocation(e.toString()))),
         );
       }
     }
@@ -366,7 +387,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             children: [
               ListTile(
                 leading: const Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
-                title: const Text('Capture from Camera'),
+                title: Text(_l10n.captureFromCamera),
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? photo = await picker.pickImage(source: ImageSource.camera);
@@ -377,7 +398,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_rounded, color: AppTheme.primary),
-                title: const Text('Choose from Gallery (Multiple)'),
+                title: Text(_l10n.chooseFromGalleryMultiple),
                 onTap: () async {
                   Navigator.pop(context);
                   final List<XFile> images = await picker.pickMultiImage();
@@ -456,8 +477,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             // We still show the success dialog for the form, but maybe warn about images
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Form saved, but some images failed to upload.'),
+                SnackBar(
+                  content: Text(_l10n.formSavedSomeImagesFailed),
                   backgroundColor: Colors.orange,
                 ),
               );
@@ -478,7 +499,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       } catch (e) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(_l10n.errorWithMessage(e.toString()))),
         );
       }
     } else {
@@ -491,12 +512,12 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           behavior: SnackBarBehavior.floating,
           shape:
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.error_rounded, color: Colors.white),
-              SizedBox(width: 10),
-              Text('Please fill all required fields.',
-                  style: TextStyle(
+              const Icon(Icons.error_rounded, color: Colors.white),
+              const SizedBox(width: 10),
+              Text(_l10n.pleaseFillAllRequiredFields,
+                  style: const TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
@@ -511,11 +532,11 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 28),
-            SizedBox(width: 10),
-            Text('Success', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 28),
+            const SizedBox(width: 10),
+            Text(_l10n.success, style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -533,8 +554,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
               ),
               child: Row(
                 children: [
-                  const Text('Original No: ', style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text(response.originalNo ?? 'N/A',
+                  Text(_l10n.originalNoLabel, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(response.originalNo ?? _l10n.notAvailable,
                       style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -546,25 +567,32 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                // Drop focus *before* the dialog closes so the underlying
-                // form field that previously had focus doesn't silently
-                // reclaim it (and pop the keyboard back up) once we return.
-                FocusManager.instance.primaryFocus?.unfocus();
+              onPressed: () async {
+                // 1. Unfocus and close keyboard immediately
+                FocusScope.of(context).unfocus();
                 
-                // Clear the form and reset validation
-                _clearForm();
-
-                // Close the dialog
+                // 2. Close the dialog first
                 Navigator.pop(ctx);
 
-                // Navigate to the History screen (index 0) in the MainScreen PageView
-                context.findAncestorStateOfType<MainScreenState>()?.setPage(0);
-                
-                // Final unfocus on the next frame to ensure keyboard stays down
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) FocusScope.of(context).unfocus();
-                });
+                // 3. Small delay to ensure dialog starts closing
+                await Future.delayed(const Duration(milliseconds: 100));
+
+                // 4. Navigate to Home (Page 0)
+                final mainScreen = context.findAncestorStateOfType<MainScreenState>();
+                if (mainScreen != null) {
+                  mainScreen.setPage(0);
+                  
+                  // 5. Wait for the PageView transition (400ms in MainScreen)
+                  // to finish before clearing the form to avoid visual glitches.
+                  await Future.delayed(const Duration(milliseconds: 450));
+                }
+
+                // 6. Finally clear the form and reset validation
+                if (mounted) {
+                  _clearForm();
+                  // 7. Ensure focus is completely cleared after form reset
+                  FocusScope.of(context).unfocus();
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
@@ -573,8 +601,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
               ),
-              child: const Text('OK',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              child: Text(_l10n.ok,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
             ),
           ),
         ],
@@ -591,7 +619,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       _mobileCtrl.clear();
       _emailCtrl.clear();
       _weatherCondition = null;
-      _geoTag = 'Tap to capture location';
+      _geoTag = _l10n.tapToCaptureLocation;
       _lat = 0.0;
       _lng = 0.0;
       _capturedPhotos.clear();
@@ -607,6 +635,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       _additionalInfoCtrl.clear();
       _specificParamsCtrl.clear();
     });
+    _loadUserData();
     _scroll.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
   }
 
@@ -650,28 +679,28 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       children: [
         _buildGroupPanel(
           icon: Icons.person_pin_rounded,
-          title: 'Collector Information',
+          title: _l10n.collectorInformation,
           accent: AppTheme.sectionColors[0],
           fields: _collectorInfoFields(),
         ),
         const SizedBox(height: 18),
         _buildGroupPanel(
           icon: Icons.location_on_rounded,
-          title: 'Location Details',
+          title: _l10n.locationDetails,
           accent: AppTheme.sectionColors[1],
           fields: _locationDetailFields(),
         ),
         const SizedBox(height: 18),
         _buildGroupPanel(
           icon: Icons.water_drop_rounded,
-          title: 'Sample Source & Classification',
+          title: _l10n.sampleSourceClassification,
           accent: AppTheme.sectionColors[2],
           fields: _sourceClassificationFields(),
         ),
         const SizedBox(height: 18),
         _buildGroupPanel(
           icon: Icons.science_rounded,
-          title: 'Additional Details',
+          title: _l10n.additionalDetails,
           accent: AppTheme.sectionColors[3],
           fields: _additionalDetailFields(),
         ),
@@ -771,16 +800,16 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                     fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 2)),
           ),
           const SizedBox(width: 10),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Water Testing',
-                  style: TextStyle(
+              Text(_l10n.sampleFormAppBarTitle,
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5)),
-              Text('Sample Collection Form',
-                  style: TextStyle(fontSize: 11, color: Colors.white70)),
+              Text(_l10n.sampleFormAppBarSubtitle,
+                  style: const TextStyle(fontSize: 11, color: Colors.white70)),
             ],
           ),
         ],
@@ -789,7 +818,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         IconButton(
           icon: const Icon(Icons.help_outline_rounded),
           onPressed: () {},
-          tooltip: 'Help',
+          tooltip: _l10n.help,
         ),
       ],
     );
@@ -803,29 +832,29 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           children: [
             Expanded(
               child: _TappableField(
-                label: 'Collected Date *',
+                label: _l10n.collectedDateLabel,
                 icon: Icons.calendar_today_rounded,
                 value: _collectedDate == null
                     ? null
                     : '${_collectedDate!.day.toString().padLeft(2, '0')}/'
                     '${_collectedDate!.month.toString().padLeft(2, '0')}/'
                     '${_collectedDate!.year}',
-                hint: 'DD / MM / YYYY',
-                onTap: _pickDate,
+                hint: _l10n.collectedDateHint,
+                onTap: null, // Made uneditable
                 validator: (_) =>
-                _collectedDate == null ? 'Required' : null,
+                _collectedDate == null ? _l10n.requiredField : null,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _TappableField(
-                label: 'Collected Time *',
+                label: _l10n.collectedTimeLabel,
                 icon: Icons.access_time_rounded,
                 value: _collectedTime?.format(context),
-                hint: 'HH : MM',
+                hint: _l10n.collectedTimeHint,
                 onTap: _pickTime,
                 validator: (_) =>
-                _collectedTime == null ? 'Required' : null,
+                _collectedTime == null ? _l10n.requiredField : null,
               ),
             ),
           ],
@@ -833,17 +862,18 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
         _buildTextField(
           controller: _nameCtrl,
-          label: 'Collector Name *',
-          hint: 'Enter full name',
+          label: _l10n.collectorNameLabel,
+          hint: _l10n.collectorNameHint,
           icon: Icons.badge_rounded,
+          readOnly: true, // Made uneditable
           validator: (v) =>
-          (v == null || v.trim().isEmpty) ? 'Required' : null,
+          (v == null || v.trim().isEmpty) ? _l10n.requiredField : null,
         ),
         const SizedBox(height: 14),
         _buildTextField(
           controller: _mobileCtrl,
-          label: 'Mobile Number *',
-          hint: '10-digit mobile number',
+          label: _l10n.mobileNumberLabel,
+          hint: _l10n.mobileNumberHint,
           icon: Icons.phone_android_rounded,
           keyboardType: TextInputType.phone,
           inputFormatters: [
@@ -851,23 +881,24 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             LengthLimitingTextInputFormatter(10),
           ],
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Required';
-            if (v.length != 10) return 'Enter valid 10-digit number';
+            if (v == null || v.isEmpty) return _l10n.requiredField;
+            if (v.length != 10) return _l10n.enterValidMobileNumber;
             return null;
           },
         ),
         const SizedBox(height: 14),
         _buildTextField(
           controller: _emailCtrl,
-          label: 'Email Address',
-          hint: 'collector@tmc.gov.in (optional)',
+          label: _l10n.emailAddressLabel,
+          hint: _l10n.emailAddressHint,
           icon: Icons.email_rounded,
+          readOnly: true, // Made uneditable
           keyboardType: TextInputType.emailAddress,
           validator: (v) {
             // Email is optional — only validate format when something is entered.
             if (v == null || v.trim().isEmpty) return null;
             final reg = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-            return reg.hasMatch(v.trim()) ? null : 'Invalid email';
+            return reg.hasMatch(v.trim()) ? null : _l10n.invalidEmail;
           },
         ),
     ];
@@ -877,30 +908,30 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   List<Widget> _locationDetailFields() {
     return [
         // Weather dropdown
-        _LabelText('Weather Conditions *'),
+        _LabelText(_l10n.weatherConditionsLabel),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: _weatherCondition,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             prefixIcon:
-            Icon(Icons.wb_cloudy_rounded, color: AppTheme.primary),
-            hintText: 'Select weather',
+            const Icon(Icons.wb_cloudy_rounded, color: AppTheme.primary),
+            hintText: _l10n.selectWeatherHint,
           ),
           items: _weatherOptions
               .map((w) => DropdownMenuItem(value: w, child: Text(w)))
               .toList(),
           onChanged: (v) => setState(() => _weatherCondition = v),
-          validator: (v) => v == null ? 'Required' : null,
+          validator: (v) => v == null ? _l10n.requiredField : null,
           borderRadius: BorderRadius.circular(12),
         ),
         const SizedBox(height: 14),
 
         // Geo-tagging
-        _LabelText('Geo-tagging *'),
+        _LabelText(_l10n.geoTaggingLabel),
         const SizedBox(height: 6),
         FormField<String>(
           validator: (_) =>
-          !_geoTag.contains('°') ? 'Please capture location' : null,
+          !_geoTag.contains('°') ? _l10n.pleaseCaptureLocation : null,
           builder: (state) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,7 +997,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              _geoTag.contains('°') ? 'Re-capture' : 'Capture',
+                              _geoTag.contains('°') ? _l10n.recapture : _l10n.capture,
                               style: TextStyle(
                                 color: AppTheme.sectionColors[1],
                                 fontSize: 12,
@@ -992,7 +1023,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
 
         // Photo capture
-        _LabelText('Capture Photos'),
+        _LabelText(_l10n.capturePhotosLabel),
         const SizedBox(height: 6),
         _PhotoGrid(
           photos: _capturedPhotos,
@@ -1016,29 +1047,29 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             : Column(
           children: [
             _buildDropdown<DropdownModel>(
-              label: 'Water / Source Type',
+              label: _l10n.waterSourceTypeLabel,
               icon: Icons.water_rounded,
               value: _selectedSourceType,
               items: _sourceTypes,
               color: AppTheme.primary,
               onChanged: (v) => setState(() => _selectedSourceType = v),
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
             const SizedBox(height: 14),
             _buildDropdown<DropdownModel>(
-              label: 'Agency',
+              label: _l10n.agencyLabel,
               icon: Icons.account_balance_rounded,
               value: _selectedAgency,
               items: _agencies,
               color: AppTheme.primary,
               onChanged: (v) => setState(() => _selectedAgency = v),
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
             const SizedBox(height: 14),
             _buildDropdown<DropdownModel>(
-              label: 'Ward',
+              label: _l10n.wardLabel,
               icon: Icons.map_rounded,
               value: _selectedWard,
               items: _wards,
@@ -1052,29 +1083,29 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                 }
               },
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
             const SizedBox(height: 14),
             _buildDropdown<DropdownModel>(
-              label: 'Type',
+              label: _l10n.typeLabel,
               icon: Icons.category_rounded,
               value: _selectedEnquiryType,
               items: _enquiryTypes,
               color: AppTheme.primary,
               onChanged: (v) => setState(() => _selectedEnquiryType = v),
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
             const SizedBox(height: 14),
             _buildDropdown<DropdownModel>(
-              label: 'Area',
+              label: _l10n.areaLabel,
               icon: Icons.location_city_rounded,
               value: _selectedArea,
               items: _areas,
               color: AppTheme.primary,
               onChanged: (v) => setState(() => _selectedArea = v),
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
           ],
         ),
@@ -1096,14 +1127,14 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDropdown<DropdownModel>(
-              label: 'Code / Name',
+              label: _l10n.codeNameLabel,
               icon: Icons.qr_code_rounded,
               value: _selectedSourceCode,
               items: _sourceCodes,
               color: AppTheme.primary,
               onChanged: (v) => setState(() => _selectedSourceCode = v),
               itemLabel: (t) => t.name,
-              validator: (v) => v == null ? 'Required' : null,
+              validator: (v) => v == null ? _l10n.requiredField : null,
             ),
             const SizedBox(height: 4),
             Row(
@@ -1113,7 +1144,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    'Code / Name options depend on the selected ward.',
+                    _l10n.codeNameHelperText,
                     style: const TextStyle(
                         fontSize: 11, color: AppTheme.hintColor),
                   ),
@@ -1129,7 +1160,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   List<Widget> _additionalDetailFields() {
     return [
         // Chlorine meter
-        _LabelText('Chlorino Meter Test *'),
+        _LabelText(_l10n.chlorineMeterTestLabel),
         const SizedBox(height: 6),
         TextFormField(
           controller: _chlorineCtrl,
@@ -1138,13 +1169,13 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
           ],
-          validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+          validator: (v) => (v == null || v.trim().isEmpty) ? _l10n.requiredField : null,
           decoration: InputDecoration(
             prefixIcon:   Icon(Icons.colorize_rounded,
                 color: Color(0xFF1565C0)),
             prefixIconColor: AppTheme.sectionColors[3],
-            hintText: '0.00',
-            suffixText: 'ppm',
+            hintText: _l10n.chlorineHint,
+            suffixText: _l10n.ppmUnit,
             suffixStyle: TextStyle(
               color: AppTheme.primary,
               fontWeight: FontWeight.w700,
@@ -1155,8 +1186,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
         _buildTextField(
           controller: _specialRequestCtrl,
-          label: 'Special Request with Reason',
-          hint: 'Describe any special testing requests and reason…',
+          label: _l10n.specialRequestLabel,
+          hint: _l10n.specialRequestHint,
           icon: Icons.priority_high_rounded,
           maxLines: 3,
           iconColor: AppTheme.primary,
@@ -1164,8 +1195,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
         _buildTextField(
           controller: _additionalInfoCtrl,
-          label: 'Any Additional Relevant Information',
-          hint: 'e.g. recent complaints, visible contamination…',
+          label: _l10n.additionalInfoLabel,
+          hint: _l10n.additionalInfoHint,
           icon: Icons.info_rounded,
           maxLines: 3,
           iconColor: AppTheme.primary,
@@ -1173,8 +1204,8 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
         _buildTextField(
           controller: _specificParamsCtrl,
-          label: 'Specific Parameters to be Tested',
-          hint: 'e.g. pH, Turbidity, E.coli, TDS, Hardness…',
+          label: _l10n.specificParamsLabel,
+          hint: _l10n.specificParamsHint,
           icon: Icons.biotech_rounded,
           maxLines: 3,
           iconColor: AppTheme.primary,
@@ -1194,6 +1225,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
     Color? iconColor,
+    bool readOnly = false,
   }) {
     return TextFormField(
       controller: controller,
@@ -1201,11 +1233,14 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       validator: validator,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon, color: iconColor ?? AppTheme.primary, size: 20),
         alignLabelWithHint: maxLines > 1,
+        filled: readOnly,
+        fillColor: readOnly ? Colors.grey.withOpacity(0.1) : Colors.white,
       ),
     );
   }
@@ -1227,7 +1262,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 6),
         DropdownButtonFormField<T>(
           value: (value == null || !items.contains(value)) ? null : value,
-          hint: Text('Select $label', style: const TextStyle(fontSize: 13, color: AppTheme.hintColor)),
+          hint: Text('${_l10n.selectPrefix} $label', style: const TextStyle(fontSize: 13, color: AppTheme.hintColor)),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: color, size: 20),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -1290,10 +1325,10 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           onTap: _isSubmitting ? null : _submitForm,
           child: Center(
             child: _isSubmitting
-                ? const Row(
+                ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
@@ -1301,10 +1336,10 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                     strokeWidth: 2.6,
                   ),
                 ),
-                SizedBox(width: 14),
+                const SizedBox(width: 14),
                 Text(
-                  'Submitting…',
-                  style: TextStyle(
+                  _l10n.submitting,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15.5,
                     fontWeight: FontWeight.w600,
@@ -1313,14 +1348,14 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                 ),
               ],
             )
-                : const Row(
+                : Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                SizedBox(width: 10),
+                const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
                 Text(
-                  'Submit Sample Form',
-                  style: TextStyle(
+                  _l10n.submitSampleForm,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -1553,7 +1588,7 @@ class _PhotoGrid extends StatelessWidget {
                     color: accentColor, size: 26),
                 const SizedBox(height: 4),
                 Text(
-                  'Add Photo',
+                  AppLocalizations.of(context)!.addPhoto,
                   style: TextStyle(
                       fontSize: 10,
                       color: accentColor,
@@ -1575,7 +1610,8 @@ class _ProgressStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labels = ['Info', 'Location', 'Source', 'Details'];
+    final l10n = AppLocalizations.of(context)!;
+    final labels = [l10n.stepInfo, l10n.stepLocation, l10n.stepSource, l10n.stepDetails];
     return Row(
       children: List.generate(4, (i) {
         final active = i < currentSection;

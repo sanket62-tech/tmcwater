@@ -11,8 +11,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
-  int _currentIndex = 1; // Start with the Form (middle)
-  final PageController _pageController = PageController(initialPage: 1);
+  int _currentIndex = 0; // Start with the Home (History)
+  final PageController _pageController = PageController(initialPage: 0);
   
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -38,6 +38,10 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
 
   void setPage(int index) {
     if (_currentIndex == index) return;
+    
+    // Always unfocus when switching pages to ensure keyboard is closed
+    FocusScope.of(context).unfocus();
+
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 400),
@@ -93,8 +97,8 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, Icons.list_alt_rounded, 'History'),
-              _buildCenterItem(),
+              _buildNavItem(0, Icons.home_rounded, 'Home'),
+              _buildNavItem(1, Icons.assignment_rounded, 'Form'),
               _buildNavItem(2, Icons.settings_outlined, 'Settings'),
             ],
           ),
@@ -116,68 +120,35 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                color: isSelected ? AppTheme.primary : AppTheme.hintColor,
-                size: 24,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? AppTheme.primary : AppTheme.hintColor,
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCenterItem() {
-    bool isSelected = _currentIndex == 1;
-    return Expanded(
-      child: InkWell(
-        onTap: () => _onItemTapped(1),
-        splashColor: AppTheme.primary.withOpacity(0.1),
-        highlightColor: Colors.transparent,
-        child: ScaleTransition(
-          scale: isSelected ? _scaleAnimation : const AlwaysStoppedAnimation(1.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
               Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isSelected 
-                      ? [AppTheme.primaryDark, AppTheme.primary]
-                      : [Colors.grey.shade400, Colors.grey.shade500],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: isSelected ? [
-                    BoxShadow(
-                      color: AppTheme.primary.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ] : null,
-                ),
-                child: const Icon(
-                  Icons.assignment_rounded,
-                  color: Colors.white,
+                padding: EdgeInsets.all(isSelected ? 8 : 0),
+                decoration: isSelected 
+                  ? BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppTheme.primaryDark, AppTheme.primary],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withOpacity(0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    )
+                  : null,
+                child: Icon(
+                  icon,
+                  color: isSelected ? Colors.white : AppTheme.hintColor,
                   size: 24,
                 ),
               ),
-              const SizedBox(height: 4),
+              if (!isSelected) const SizedBox(height: 4),
+              if (isSelected) const SizedBox(height: 2),
               Text(
-                'Form',
+                label,
                 style: TextStyle(
                   color: isSelected ? AppTheme.primary : AppTheme.hintColor,
                   fontSize: 11,

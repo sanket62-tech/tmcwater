@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(flutter analyze *)",
-      "Bash(grep -n \"_buildFormCard\\\\|_sectionDivider\\\\|child: Column\\(\\\\s*$\" lib/src/features/sample_form/presentation/screens/sample_form.dart)"
+      "Bash(grep -n \"_buildFormCard\\\\|_sectionDivider\\\\|child: Column\\(\\\\s*$\" lib/src/features/sample_form/presentation/screens/sample_form.dart)",
+      "Bash(grep -n ''\\\\''Required'\\\\''\\\\|'\\\\''Enter valid\\\\|'\\\\''Invalid email'\\\\''\\\\|'\\\\''Please capture location'\\\\''\\\\|'\\\\''Re-capture'\\\\''\\\\|'\\\\''Capture'\\\\''\\\\|'\\\\''Add Photo'\\\\''\\\\|'\\\\''Info'\\\\''\\\\|'\\\\''Location'\\\\''\\\\|'\\\\''Source'\\\\''\\\\|'\\\\''Details'\\\\''\\\\|Code / Name options\\\\|Submit Sample Form\\\\|Submitting\\\\|Tap to capture location\\\\|Please fill all\\\\|0\\\\.00\\\\|ppm\\\\|Select $label\\\\|Original No' lib/src/features/sample_form/presentation/screens/sample_form.dart)",
+      "Bash(flutter gen-l10n *)"
     ]
   }
 }

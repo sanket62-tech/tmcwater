@@ -5,6 +5,8 @@ import 'package:water_collector/src/features/history/data/models/sample_history_
 import 'package:water_collector/src/features/history/data/services/history_api_service.dart';
 import 'package:water_collector/src/core/services/storage_service.dart';
 
+import '../../../../../l10n/app_localizations.dart';
+
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
@@ -24,6 +26,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   int? _userId;
+
+  /// Shorthand accessor for the localized strings — safe to use both inside
+  /// `build()` and in async callbacks (the State's `context` stays valid for
+  /// as long as the widget is mounted).
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
   @override
   void initState() {
@@ -121,16 +128,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 2)),
           ),
           const SizedBox(width: 10),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Water Testing',
-                  style: TextStyle(
+              Text(_l10n.sampleFormAppBarTitle,
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5)),
-              Text('Sample History',
-                  style: TextStyle(fontSize: 11, color: Colors.white70)),
+              Text(_l10n.historyAppBarSubtitle,
+                  style: const TextStyle(fontSize: 11, color: Colors.white70)),
             ],
           ),
         ],
@@ -139,7 +146,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         IconButton(
           icon: const Icon(Icons.refresh_rounded),
           onPressed: _fetchHistory,
-          tooltip: 'Refresh',
+          tooltip: _l10n.refresh,
         ),
       ],
     );
@@ -154,7 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           const SizedBox(height: 16),
           Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
           const SizedBox(height: 20),
-          ElevatedButton(onPressed: _fetchHistory, child: const Text('Retry')),
+          ElevatedButton(onPressed: _fetchHistory, child: Text(_l10n.retry)),
         ],
       ),
     );
@@ -179,7 +186,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _currentPage = 0;
         }),
         decoration: InputDecoration(
-          hintText: 'Search by Original No, Ward...',
+          hintText: _l10n.searchHistoryHint,
           prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF1565C0)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -230,9 +237,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 const Icon(Icons.history_rounded, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
-                const Text(
-                  'Recent Submissions',
-                  style: TextStyle(
+                Text(
+                  _l10n.recentSubmissions,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
                     fontSize: 16,
@@ -246,7 +253,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    '${_filteredHistory.length} Records',
+                    _l10n.recordsCount(_filteredHistory.length),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
@@ -290,11 +297,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
       color: const Color(0xFF1565C0).withOpacity(0.04),
       child: Row(
         children: [
-          _headerCell('Original No.', 2),
-          _headerCell('Ward', 2),
-          _headerCell('Type', 2),
-          _headerCell('Date', 2),
-          _headerCell('Details', 1, textAlign: TextAlign.center),
+          _headerCell(_l10n.columnOriginalNo, 2),
+          _headerCell(_l10n.columnWard, 2),
+          _headerCell(_l10n.columnType, 2),
+          _headerCell(_l10n.columnDate, 2),
+          _headerCell(_l10n.columnDetails, 1, textAlign: TextAlign.center),
         ],
       ),
     );
@@ -377,7 +384,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             children: [
               const Icon(Icons.info_outline_rounded, color: Colors.white),
               const SizedBox(width: 10),
-              const Text('Sample Details', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(_l10n.sampleDetails, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.white),
@@ -392,35 +399,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _detailSection('General Info', [
-                  _detailRow('Original No', record.originalNo),
-                  _detailRow('Status', record.status),
-                  _detailRow('Date', record.collectionDate),
-                  _detailRow('Time', record.collectedTime),
+                _detailSection(_l10n.generalInfo, [
+                  _detailRow(_l10n.detailOriginalNo, record.originalNo),
+                  _detailRow(_l10n.detailStatus, record.status),
+                  _detailRow(_l10n.detailDate, record.collectionDate),
+                  _detailRow(_l10n.detailTime, record.collectedTime),
                 ]),
-                _detailSection('Collector Info', [
-                  _detailRow('Name', record.collectorName),
-                  _detailRow('Mobile', record.mobileNumber),
-                  _detailRow('Email', record.email),
+                _detailSection(_l10n.collectorInfo, [
+                  _detailRow(_l10n.detailName, record.collectorName),
+                  _detailRow(_l10n.detailMobile, record.mobileNumber),
+                  _detailRow(_l10n.detailEmail, record.email),
                 ]),
-                _detailSection('Location & Source', [
-                  _detailRow('Ward', record.wardName),
-                  _detailRow('Area', record.areaName),
-                  _detailRow('Source Type', record.sourceType),
-                  _detailRow('Agency', record.agencyName),
-                  _detailRow('Code ID', record.codeId),
-                  _detailRow('Code Name', record.codeName),
-                  _detailRow('Weather', record.weatherConditions),
-                  _detailRow('Lat/Long', '${record.latitude}, ${record.longitude}'),
+                _detailSection(_l10n.locationSource, [
+                  _detailRow(_l10n.detailWard, record.wardName),
+                  _detailRow(_l10n.detailArea, record.areaName),
+                  _detailRow(_l10n.detailSourceType, record.sourceType),
+                  _detailRow(_l10n.detailAgency, record.agencyName),
+                  _detailRow(_l10n.detailCodeId, record.codeId),
+                  _detailRow(_l10n.detailCodeName, record.codeName),
+                  _detailRow(_l10n.detailWeather, record.weatherConditions),
+                  _detailRow(_l10n.detailLatLong, '${record.latitude}, ${record.longitude}'),
                 ]),
-                _detailSection('Testing Info', [
-                  _detailRow('Residual Chlorine', record.residualChlorine),
-                  _detailRow('Enquiry Type', record.enquiryType),
-                  _detailRow('Special Request', record.specialRequestWithReason),
-                  _detailRow('Additional Info', record.additionalRelevantInformation),
-                  _detailRow('Specific Params', record.specificParametersToBeTested),
+                _detailSection(_l10n.testingInfo, [
+                  _detailRow(_l10n.detailResidualChlorine, record.residualChlorine),
+                  _detailRow(_l10n.detailEnquiryType, record.enquiryType),
+                  _detailRow(_l10n.detailSpecialRequest, record.specialRequestWithReason),
+                  _detailRow(_l10n.detailAdditionalInfo, record.additionalRelevantInformation),
+                  _detailRow(_l10n.detailSpecificParams, record.specificParametersToBeTested),
                 ]),
-                _detailSection('Uploaded Documents', [
+                _detailSection(_l10n.uploadedDocuments, [
                   FutureBuilder<List<DocumentModel>>(
                     future: _historyApi.getDocuments(record.originalNo, _userId ?? 0),
                     builder: (context, snapshot) {
@@ -433,9 +440,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         );
                       }
                       if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text('No documents found.', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(_l10n.noDocumentsFound, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                         );
                       }
 
@@ -452,7 +459,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1565C0))),
+            child: Text(_l10n.close, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1565C0))),
           ),
         ],
       ),
@@ -483,7 +490,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     print('Could not launch ${doc.fileUrl}');
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Could not open the document link.')),
+                        SnackBar(content: Text(_l10n.couldNotOpenDocument)),
                       );
                     }
                   }
@@ -491,7 +498,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   print('Error launching URL: $e');
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
+                      SnackBar(content: Text(_l10n.errorWithMessage(e.toString()))),
                     );
                   }
                 }
@@ -537,7 +544,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Text(label, style: TextStyle(fontSize: 12, color: const Color(0xFF37474F).withOpacity(0.7), fontWeight: FontWeight.w600)),
           ),
           Expanded(
-            child: Text(value.isEmpty ? 'N/A' : value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            child: Text(value.isEmpty ? _l10n.notAvailable : value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
           ),
         ],
       ),
@@ -551,7 +558,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Page ${_currentPage + 1} of $_totalPages',
+            _l10n.pageOfLabel(_currentPage + 1, _totalPages),
             style: TextStyle(
               fontSize: 11,
               color: const Color(0xFF37474F).withOpacity(0.6),
@@ -603,7 +610,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          _searchQuery.isEmpty ? 'No records found' : 'No results for "$_searchQuery"',
+          _searchQuery.isEmpty ? _l10n.noRecordsFound : _l10n.noResultsFor(_searchQuery),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -617,7 +624,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               _searchQuery = '';
               _currentPage = 0;
             }),
-            child: const Text('Clear Search'),
+            child: Text(_l10n.clearSearch),
           ),
         ],
       ],

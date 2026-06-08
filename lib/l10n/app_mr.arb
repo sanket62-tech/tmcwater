@@ -13,5 +13,150 @@
   "email": "ईमेल",
   "username": "वापरकर्तानाव",
   "role": "भूमिका",
-  "close": "बंद करा"
+  "close": "बंद करा",
+
+  "sampleFormAppBarTitle": "जल चाचणी",
+  "sampleFormAppBarSubtitle": "नमुना संकलन फॉर्म",
+  "help": "मदत",
+
+  "collectorInformation": "संकलक माहिती",
+  "locationDetails": "स्थान तपशील",
+  "sampleSourceClassification": "नमुना स्रोत आणि वर्गीकरण",
+  "additionalDetails": "अतिरिक्त तपशील",
+
+  "stepInfo": "माहिती",
+  "stepLocation": "स्थान",
+  "stepSource": "स्रोत",
+  "stepDetails": "तपशील",
+
+  "collectedDateLabel": "संकलन तारीख *",
+  "collectedDateHint": "DD / MM / YYYY",
+  "collectedTimeLabel": "संकलन वेळ *",
+  "collectedTimeHint": "HH : MM",
+  "collectorNameLabel": "संकलकाचे नाव *",
+  "collectorNameHint": "पूर्ण नाव प्रविष्ट करा",
+  "mobileNumberLabel": "मोबाईल क्रमांक *",
+  "mobileNumberHint": "१०-अंकी मोबाईल क्रमांक",
+  "emailAddressLabel": "ईमेल पत्ता",
+  "emailAddressHint": "collector@tmc.gov.in (ऐच्छिक)",
+
+  "weatherConditionsLabel": "हवामान स्थिती *",
+  "selectWeatherHint": "हवामान निवडा",
+  "geoTaggingLabel": "जिओ-टॅगिंग *",
+  "tapToCaptureLocation": "स्थान कॅप्चर करण्यासाठी टॅप करा",
+  "recapture": "पुन्हा कॅप्चर करा",
+  "capture": "कॅप्चर करा",
+  "capturePhotosLabel": "फोटो कॅप्चर करा",
+  "addPhoto": "फोटो जोडा",
+
+  "waterSourceTypeLabel": "पाणी / स्रोत प्रकार",
+  "agencyLabel": "संस्था",
+  "wardLabel": "प्रभाग",
+  "typeLabel": "प्रकार",
+  "areaLabel": "क्षेत्र",
+  "codeNameLabel": "कोड / नाव",
+  "codeNameHelperText": "कोड / नाव पर्याय निवडलेल्या प्रभागावर अवलंबून असतात.",
+  "selectPrefix": "निवडा",
+
+  "chlorineMeterTestLabel": "क्लोरिनो मीटर चाचणी *",
+  "chlorineHint": "0.00",
+  "ppmUnit": "ppm",
+  "specialRequestLabel": "कारणासह विशेष विनंती",
+  "specialRequestHint": "कोणतीही विशेष चाचणी विनंती आणि कारण यांचे वर्णन करा…",
+  "additionalInfoLabel": "कोणतीही अतिरिक्त संबंधित माहिती",
+  "additionalInfoHint": "उदा. अलीकडील तक्रारी, दृश्यमान दूषितता…",
+  "specificParamsLabel": "चाचणी करावयाचे विशिष्ट मापदंड",
+  "specificParamsHint": "उदा. pH, गढूळपणा, E.coli, TDS, कठीणपणा…",
+
+  "requiredField": "आवश्यक",
+  "enterValidMobileNumber": "वैध १०-अंकी क्रमांक प्रविष्ट करा",
+  "invalidEmail": "अवैध ईमेल",
+  "pleaseCaptureLocation": "कृपया स्थान कॅप्चर करा",
+
+  "errorLoadingFormData": "फॉर्म डेटा लोड करताना त्रुटी: {error}",
+  "@errorLoadingFormData": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "failedToLoadSourceCodes": "स्रोत कोड लोड करण्यात अयशस्वी: {error}",
+  "@failedToLoadSourceCodes": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "locationServicesDisabled": "स्थान सेवा अक्षम आहेत.",
+  "locationPermissionDenied": "स्थान परवानग्या नाकारल्या आहेत",
+  "locationPermissionPermanentlyDenied": "स्थान परवानग्या कायमस्वरूपी नाकारल्या आहेत, आम्ही परवानगी मागू शकत नाही.",
+  "errorFetchingLocation": "स्थान मिळवताना त्रुटी: {error}",
+  "@errorFetchingLocation": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "captureFromCamera": "कॅमेऱ्याने कॅप्चर करा",
+  "chooseFromGalleryMultiple": "गॅलरीमधून निवडा (एकाधिक)",
+  "formSavedSomeImagesFailed": "फॉर्म जतन झाला, परंतु काही प्रतिमा अपलोड करण्यात अयशस्वी झाल्या.",
+  "errorWithMessage": "त्रुटी: {error}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "pleaseFillAllRequiredFields": "कृपया सर्व आवश्यक फील्ड भरा.",
+  "success": "यशस्वी",
+  "originalNoLabel": "मूळ क्रमांक: ",
+  "notAvailable": "लागू नाही",
+  "ok": "ठीक आहे",
+  "submitSampleForm": "नमुना फॉर्म सबमिट करा",
+  "submitting": "सबमिट करत आहे…",
+
+  "historyAppBarSubtitle": "नमुना इतिहास",
+  "refresh": "रिफ्रेश करा",
+  "retry": "पुन्हा प्रयत्न करा",
+  "searchHistoryHint": "मूळ क्रमांक, प्रभाग द्वारे शोधा...",
+  "recentSubmissions": "अलीकडील सबमिशन",
+  "recordsCount": "{count} नोंदी",
+  "@recordsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "columnOriginalNo": "मूळ क्रमांक",
+  "columnWard": "प्रभाग",
+  "columnType": "प्रकार",
+  "columnDate": "तारीख",
+  "columnDetails": "तपशील",
+  "sampleDetails": "नमुना तपशील",
+  "generalInfo": "सामान्य माहिती",
+  "collectorInfo": "संकलक माहिती",
+  "locationSource": "स्थान आणि स्रोत",
+  "testingInfo": "चाचणी माहिती",
+  "uploadedDocuments": "अपलोड केलेली कागदपत्रे",
+  "noDocumentsFound": "कोणतीही कागदपत्रे आढळली नाहीत.",
+  "couldNotOpenDocument": "दस्तऐवज दुवा उघडता आला नाही.",
+  "detailOriginalNo": "मूळ क्रमांक",
+  "detailStatus": "स्थिती",
+  "detailDate": "तारीख",
+  "detailTime": "वेळ",
+  "detailName": "नाव",
+  "detailMobile": "मोबाईल",
+  "detailEmail": "ईमेल",
+  "detailWard": "प्रभाग",
+  "detailArea": "क्षेत्र",
+  "detailSourceType": "स्रोत प्रकार",
+  "detailAgency": "संस्था",
+  "detailCodeId": "कोड आयडी",
+  "detailCodeName": "कोड नाव",
+  "detailWeather": "हवामान",
+  "detailLatLong": "अक्षांश/रेखांश",
+  "detailResidualChlorine": "अवशिष्ट क्लोरीन",
+  "detailEnquiryType": "चौकशी प्रकार",
+  "detailSpecialRequest": "विशेष विनंती",
+  "detailAdditionalInfo": "अतिरिक्त माहिती",
+  "detailSpecificParams": "विशिष्ट मापदंड",
+  "pageOfLabel": "पृष्ठ {current} पैकी {total}",
+  "noRecordsFound": "कोणत्याही नोंदी आढळल्या नाहीत",
+  "noResultsFor": "\"{query}\" साठी कोणतेही परिणाम नाहीत",
+  "clearSearch": "शोध साफ करा"
 }
