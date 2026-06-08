@@ -139,12 +139,12 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   final _specificParamsCtrl = TextEditingController();
 
   static const List<String> _weatherOptions = [
-    'Sunny ☀️',
-    'Cloudy ☁️',
-    'Rainy 🌧️',
-    'Partly Cloudy ⛅',
-    'Foggy 🌫️',
-    'Stormy ⛈️',
+    'Sunny',
+    'Cloudy',
+    'Rainy',
+    'Partly Cloudy',
+    'Foggy',
+    'Stormy',
   ];
 
   // ── Ward → code prefix map ──
