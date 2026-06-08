@@ -22,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -107,6 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       }
+    } else {
+      setState(() {
+        _autovalidateMode = AutovalidateMode.onUserInteraction;
+      });
     }
   }
 
@@ -203,6 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginForm() {
     return Form(
       key: _formKey,
+      autovalidateMode: _autovalidateMode,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

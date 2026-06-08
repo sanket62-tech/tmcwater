@@ -44,7 +44,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final results = await _historyApi.getWaterSampleDetails(userData.userId!);
         if (mounted) {
           setState(() {
-            _allHistory = results;
+            _allHistory = results.reversed.toList();
             _isLoading = false;
           });
         }
@@ -124,7 +124,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Jal Namuna',
+              Text('Water Testing',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,

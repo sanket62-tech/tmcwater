@@ -10,6 +10,7 @@ import 'package:water_collector/src/features/sample_form/data/services/sample_fo
 import 'package:water_collector/src/features/sample_form/data/models/water_sample_model.dart';
 import 'package:water_collector/src/core/services/storage_service.dart';
 import 'package:intl/intl.dart';
+import 'package:water_collector/src/features/home/presentation/screens/main_screen.dart';
 
 
 
@@ -22,7 +23,7 @@ class JalNamunaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Jal Namuna – BMC',
+      title: 'Water Testing – BMC',
       theme: AppTheme.theme,
       home: const SampleCollectionFormPage(),
     );
@@ -93,6 +94,7 @@ class SampleCollectionFormPage extends StatefulWidget {
 class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _scroll = ScrollController();
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   // ── Section 1 ──
   DateTime? _collectedDate;
@@ -400,6 +402,9 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   }
 
   Future<void> _submitForm() async {
+    // Unfocus any active text field to close keyboard before showing dialog
+    FocusScope.of(context).unfocus();
+
     if (_formKey.currentState!.validate()) {
       setState(() => _isSubmitting = true);
 
@@ -477,6 +482,9 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         );
       }
     } else {
+      setState(() {
+        _autovalidateMode = AutovalidateMode.onUserInteraction;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red[700],
@@ -533,27 +541,41 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             ),
           ],
         ),
+        actionsAlignment: MainAxisAlignment.center,
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _clearForm();
-            },
-            child: const Text('New Form', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              _clearForm();
-              // Navigate to history - assuming it's part of a bottom nav or similar
-              // For now, we'll just show how to trigger a flow change if needed.
-              // If there's a MainScreen with tabs, we might need to switch tab.
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Drop focus *before* the dialog closes so the underlying
+                // form field that previously had focus doesn't silently
+                // reclaim it (and pop the keyboard back up) once we return.
+                FocusManager.instance.primaryFocus?.unfocus();
+                
+                // Clear the form and reset validation
+                _clearForm();
+
+                // Close the dialog
+                Navigator.pop(ctx);
+
+                // Navigate to the History screen (index 0) in the MainScreen PageView
+                context.findAncestorStateOfType<MainScreenState>()?.setPage(0);
+                
+                // Final unfocus on the next frame to ensure keyboard stays down
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) FocusScope.of(context).unfocus();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('OK',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
             ),
-            child: const Text('View History', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -562,6 +584,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
 
   void _clearForm() {
     setState(() {
+      _autovalidateMode = AutovalidateMode.disabled;
       _collectedDate = DateTime.now();
       _collectedTime = TimeOfDay.now();
       _nameCtrl.clear();
@@ -589,28 +612,143 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.surface,
-      appBar: _buildAppBar(),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          controller: _scroll,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-          children: [
-            _ProgressStepper(currentSection: 4),
-            const SizedBox(height: 16),
-            _section1CollectorInfo(),
-            const SizedBox(height: 16),
-            _section2LocationDetails(),
-            const SizedBox(height: 16),
-            _section3SourceClassification(),
-            const SizedBox(height: 16),
-            _section4AdditionalDetails(),
-            const SizedBox(height: 28),
-            _buildSubmitButton(),
-          ],
+    return GestureDetector(
+      // Tapping anywhere outside an input drops the keyboard / focus instead
+      // of leaving it stuck on whatever field happens to be focused.
+      behavior: HitTestBehavior.opaque,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppTheme.surface,
+        resizeToAvoidBottomInset: false,
+        appBar: _buildAppBar(),
+        body: Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: ListView(
+            controller: _scroll,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+            children: [
+              _ProgressStepper(currentSection: 4),
+              const SizedBox(height: 18),
+              _buildFormSections(),
+              const SizedBox(height: 28),
+              _buildSubmitButton(),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  /// Whole form, laid out as a single continuous flow of softly-tinted
+  /// "group" cards — each its own rounded panel with a compact icon-badge
+  /// heading and a slim colour-accent underline (no full-width banner bars,
+  /// no collapsible sections — everything is visible at once).
+  Widget _buildFormSections() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildGroupPanel(
+          icon: Icons.person_pin_rounded,
+          title: 'Collector Information',
+          accent: AppTheme.sectionColors[0],
+          fields: _collectorInfoFields(),
+        ),
+        const SizedBox(height: 18),
+        _buildGroupPanel(
+          icon: Icons.location_on_rounded,
+          title: 'Location Details',
+          accent: AppTheme.sectionColors[1],
+          fields: _locationDetailFields(),
+        ),
+        const SizedBox(height: 18),
+        _buildGroupPanel(
+          icon: Icons.water_drop_rounded,
+          title: 'Sample Source & Classification',
+          accent: AppTheme.sectionColors[2],
+          fields: _sourceClassificationFields(),
+        ),
+        const SizedBox(height: 18),
+        _buildGroupPanel(
+          icon: Icons.science_rounded,
+          title: 'Additional Details',
+          accent: AppTheme.sectionColors[3],
+          fields: _additionalDetailFields(),
+        ),
+      ],
+    );
+  }
+
+  /// A single rounded, softly-tinted panel: icon badge + title + accent
+  /// underline, followed by its fields. Replaces the old bold gradient
+  /// section header bars with a calmer, modern card treatment.
+  Widget _buildGroupPanel({
+    required IconData icon,
+    required String title,
+    required Color accent,
+    required List<Widget> fields,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: accent.withOpacity(0.16), width: 1.3),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withOpacity(0.10),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [accent.withOpacity(0.20), accent.withOpacity(0.08)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: accent, size: 21),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.labelColor,
+                    letterSpacing: 0.1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            margin: const EdgeInsets.only(left: 58),
+            height: 3.5,
+            width: 50,
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 22),
+          ...fields,
+        ],
       ),
     );
   }
@@ -636,7 +774,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Jal Namuna',
+              Text('Water Testing',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -657,14 +795,9 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
     );
   }
 
-  // ─────────────────────────── SECTION 1 ───────────────────────────
-  Widget _section1CollectorInfo() {
-    return _SectionCard(
-      sectionNumber: 1,
-      title: 'Collector Information',
-      icon: Icons.person_pin_rounded,
-      color: AppTheme.sectionColors[0],
-      children: [
+  // ─────────────────────────── COLLECTOR INFO FIELDS ───────────────────────────
+  List<Widget> _collectorInfoFields() {
+    return [
         // Date & Time in a row
         Row(
           children: [
@@ -678,7 +811,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                     '${_collectedDate!.month.toString().padLeft(2, '0')}/'
                     '${_collectedDate!.year}',
                 hint: 'DD / MM / YYYY',
-                onTap: null,
+                onTap: _pickDate,
                 validator: (_) =>
                 _collectedDate == null ? 'Required' : null,
               ),
@@ -690,7 +823,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
                 icon: Icons.access_time_rounded,
                 value: _collectedTime?.format(context),
                 hint: 'HH : MM',
-                onTap: null,
+                onTap: _pickTime,
                 validator: (_) =>
                 _collectedTime == null ? 'Required' : null,
               ),
@@ -726,28 +859,23 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
         const SizedBox(height: 14),
         _buildTextField(
           controller: _emailCtrl,
-          label: 'Email Address *',
-          hint: 'collector@tmc.gov.in',
+          label: 'Email Address',
+          hint: 'collector@tmc.gov.in (optional)',
           icon: Icons.email_rounded,
           keyboardType: TextInputType.emailAddress,
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Required';
+            // Email is optional — only validate format when something is entered.
+            if (v == null || v.trim().isEmpty) return null;
             final reg = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-            return reg.hasMatch(v) ? null : 'Invalid email';
+            return reg.hasMatch(v.trim()) ? null : 'Invalid email';
           },
         ),
-      ],
-    );
+    ];
   }
 
-  // ─────────────────────────── SECTION 2 ───────────────────────────
-  Widget _section2LocationDetails() {
-    return _SectionCard(
-      sectionNumber: 2,
-      title: 'Location Details',
-      icon: Icons.location_on_rounded,
-      color: AppTheme.sectionColors[0],
-      children: [
+  // ─────────────────────────── LOCATION DETAIL FIELDS ───────────────────────────
+  List<Widget> _locationDetailFields() {
+    return [
         // Weather dropdown
         _LabelText('Weather Conditions *'),
         const SizedBox(height: 6),
@@ -872,18 +1000,12 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           onRemove: _removePhoto,
           accentColor: AppTheme.primary,
         ),
-      ],
-    );
+    ];
   }
 
-  // ─────────────────────────── SECTION 3 ───────────────────────────
-  Widget _section3SourceClassification() {
-    return _SectionCard(
-      sectionNumber: 3,
-      title: 'Sample Source & Classification',
-      icon: Icons.water_drop_rounded,
-      color: AppTheme.primary,
-      children: [
+  // ─────────────────────────── SOURCE CLASSIFICATION FIELDS ───────────────────────────
+  List<Widget> _sourceClassificationFields() {
+    return [
         _isLoadingDropdowns
             ? const Center(
           child: Padding(
@@ -1000,18 +1122,12 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
             ),
           ],
         ),
-      ],
-    );
+    ];
   }
 
-  // ─────────────────────────── SECTION 4 ───────────────────────────
-  Widget _section4AdditionalDetails() {
-    return _SectionCard(
-      sectionNumber: 4,
-      title: 'Additional Details',
-      icon: Icons.science_rounded,
-      color: AppTheme.primary,
-      children: [
+  // ─────────────────────────── ADDITIONAL DETAIL FIELDS ───────────────────────────
+  List<Widget> _additionalDetailFields() {
+    return [
         // Chlorine meter
         _LabelText('Chlorino Meter Test *'),
         const SizedBox(height: 6),
@@ -1063,8 +1179,7 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
           maxLines: 3,
           iconColor: AppTheme.primary,
         ),
-      ],
-    );
+    ];
   }
 
   // ─────────────────────────── HELPERS ───────────────────────────
@@ -1147,38 +1262,56 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
   }
 
   Widget _buildSubmitButton() {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
       width: double.infinity,
-      height: 54,
+      height: 56,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryDark, AppTheme.primary],
+        gradient: LinearGradient(
+          colors: _isSubmitting
+              ? [AppTheme.primary.withOpacity(0.6), AppTheme.primaryDark.withOpacity(0.6)]
+              : const [AppTheme.primaryDark, AppTheme.primary],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: AppTheme.primary.withOpacity(_isSubmitting ? 0.18 : 0.38),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           onTap: _isSubmitting ? null : _submitForm,
           child: Center(
             child: _isSubmitting
-                ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 3,
-              ),
+                ? const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.6,
+                  ),
+                ),
+                SizedBox(width: 14),
+                Text(
+                  'Submitting…',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ],
             )
                 : const Row(
               mainAxisSize: MainAxisSize.min,
@@ -1207,151 +1340,6 @@ class _SampleCollectionFormPageState extends State<SampleCollectionFormPage> {
 //  REUSABLE COMPONENTS
 // ─────────────────────────────────────────────────────────────
 
-/// Section card with coloured header strip
-class _SectionCard extends StatefulWidget {
-  final int sectionNumber;
-  final String title;
-  final IconData icon;
-  final Color color;
-  final List<Widget> children;
-
-  const _SectionCard({
-    required this.sectionNumber,
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.children,
-  });
-
-  @override
-  State<_SectionCard> createState() => _SectionCardState();
-}
-
-class _SectionCardState extends State<_SectionCard>
-    with SingleTickerProviderStateMixin {
-  bool _expanded = true;
-  late AnimationController _ctrl;
-  late Animation<double> _expand;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-    _expand =
-        CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
-    _ctrl.forward();
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  void _toggle() {
-    setState(() => _expanded = !_expanded);
-    _expanded ? _ctrl.forward() : _ctrl.reverse();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: widget.color.withOpacity(0.10),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-            color: widget.color.withOpacity(0.18), width: 1.2),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          children: [
-            // Header
-            InkWell(
-              onTap: _toggle,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 13),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      widget.color,
-                      widget.color.withOpacity(0.82),
-                    ],
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${widget.sectionNumber}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Icon(widget.icon, color: Colors.white70, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                    ),
-                    AnimatedRotation(
-                      turns: _expanded ? 0.5 : 0,
-                      duration: const Duration(milliseconds: 300),
-                      child: const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Body
-            SizeTransition(
-              sizeFactor: _expand,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widget.children,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// Tappable read-only field (date / time / location)
 class _TappableField extends FormField<String> {
   _TappableField({
@@ -1359,7 +1347,7 @@ class _TappableField extends FormField<String> {
     required IconData icon,
     required String? value,
     required String hint,
-    VoidCallback? onTap,
+    Future<void> Function()? onTap,
     String? Function(String?)? validator,
   }) : super(
     validator: validator,
@@ -1373,8 +1361,8 @@ class _TappableField extends FormField<String> {
           InkWell(
             onTap: onTap == null
                 ? null
-                : () {
-              onTap();
+                : () async {
+              await onTap();
               state.didChange(value);
             },
             borderRadius: BorderRadius.circular(10),
@@ -1439,14 +1427,31 @@ class _LabelText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: AppTheme.labelColor,
-      ),
+    const baseStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: AppTheme.labelColor,
     );
+
+    // Highlight the trailing "required" asterisk in red so mandatory
+    // fields stand out at a glance, matching the validation error color.
+    if (text.trim().endsWith('*')) {
+      final base = text.substring(0, text.lastIndexOf('*')).trimRight();
+      return RichText(
+        text: TextSpan(
+          style: baseStyle,
+          children: [
+            TextSpan(text: base),
+            const TextSpan(
+              text: ' *',
+              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w800),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Text(text, style: baseStyle);
   }
 }
 

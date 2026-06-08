@@ -7,10 +7,10 @@ class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<MainScreen> createState() => MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   int _currentIndex = 1; // Start with the Form (middle)
   final PageController _pageController = PageController(initialPage: 1);
   
@@ -36,6 +36,15 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
+  void setPage(int index) {
+    if (_currentIndex == index) return;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
@@ -45,12 +54,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   }
 
   void _onItemTapped(int index) {
-    if (_currentIndex == index) return;
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOutCubic,
-    );
+    setPage(index);
   }
 
   @override
@@ -71,9 +75,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   }
 
   Widget _buildBottomBar() {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
-      padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -84,15 +86,18 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           ),
         ],
       ),
-      child: SizedBox(
-        height: 65,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(0, Icons.list_alt_rounded, 'History'),
-            _buildCenterItem(),
-            _buildNavItem(2, Icons.settings_outlined, 'Settings'),
-          ],
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 65,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.list_alt_rounded, 'History'),
+              _buildCenterItem(),
+              _buildNavItem(2, Icons.settings_outlined, 'Settings'),
+            ],
+          ),
         ),
       ),
     );

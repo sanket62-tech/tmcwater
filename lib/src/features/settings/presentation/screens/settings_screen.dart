@@ -115,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Jal Namuna',
+              const Text('Water Testing',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,

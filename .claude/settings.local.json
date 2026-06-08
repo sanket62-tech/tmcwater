@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(flutter analyze *)"
+      "Bash(flutter analyze *)",
+      "Bash(grep -n \"_buildFormCard\\\\|_sectionDivider\\\\|child: Column\\(\\\\s*$\" lib/src/features/sample_form/presentation/screens/sample_form.dart)"
     ]
   }
 }
